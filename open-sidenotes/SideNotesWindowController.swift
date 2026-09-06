@@ -7,7 +7,7 @@ class KeyableWindow: NSWindow {
 }
 
 class SideNotesWindowController: NSWindowController {
-    private var mouseMoveMonitor: Any?
+    private var pollTimer: Timer?
     private var clickMonitor: Any?
     private var keyMonitor: Any?
     private let windowWidth: CGFloat = 400
@@ -69,9 +69,14 @@ class SideNotesWindowController: NSWindowController {
     }
 
     private func setupEventMonitors() {
-        mouseMoveMonitor = NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) { [weak self] event in
+        // Global mouse-moved monitors receive no events while this app is active,
+        // so edge detection would silently die after auto-hide closes the window.
+        // Polling NSEvent.mouseLocation works regardless of activation state.
+        let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
             self?.handleMouseMove()
         }
+        RunLoop.main.add(timer, forMode: .common)
+        pollTimer = timer
 
         clickMonitor = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
             self?.handleClickOutside(event)
@@ -115,10 +120,8 @@ class SideNotesWindowController: NSWindowController {
 
     deinit {
         hideTimer?.invalidate()
+        pollTimer?.invalidate()
 
-        if let monitor = mouseMoveMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
         if let monitor = clickMonitor {
             NSEvent.removeMonitor(monitor)
         }
@@ -210,7 +213,6 @@ class SideNotesWindowController: NSWindowController {
         }, completionHandler: { [weak self] in
             window.orderOut(nil)
             self?.isAnimating = false
-            NSRunningApplication.current.deactivate()
         })
     }
 
