@@ -136,12 +136,12 @@ class SideNotesWindowController: NSWindowController {
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
         let atLeftEdge = mouseLocation.x <= visibleFrame.minX + 2
 
-        if atLeftEdge && !lastAtLeftEdge {
+        if atLeftEdge && (!lastAtLeftEdge || !isShown) {
             if !isShown {
                 showWindow()
             }
             cancelHideTimer()
-        } else if isShown && !isMouseInWindow() && settings.autoHideOnMouseExit {
+        } else if isShown && !isMouseInWindow() && !isAnimating && settings.autoHideOnMouseExit {
             startHideTimer()
         }
 
@@ -210,6 +210,7 @@ class SideNotesWindowController: NSWindowController {
         }, completionHandler: { [weak self] in
             window.orderOut(nil)
             self?.isAnimating = false
+            NSRunningApplication.current.deactivate()
         })
     }
 
