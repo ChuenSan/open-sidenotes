@@ -103,22 +103,22 @@ struct SettingsView: View {
                     headerSection
 
                     SettingsCard(
-                        title: "Appearance",
-                        subtitle: "Dock icon and display behavior"
+                        title: "外观",
+                        subtitle: "Dock 图标与显示行为"
                     ) {
                         Toggle(isOn: $shortcutSettings.showDockIcon) {
-                            Text("Show Dock Icon")
+                            Text("在 Dock 中显示图标")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(Color(hex: "3B433E"))
                         }
                         .toggleStyle(CustomToggleStyle(tintColor: Color(hex: "6E8B77")))
 
-                        sectionHint("Requires app restart to fully apply")
+                        sectionHint("需要重启应用才能完全生效")
                     }
 
                     SettingsCard(
-                        title: "Storage",
-                        subtitle: "Markdown files location"
+                        title: "存储",
+                        subtitle: "Markdown 文件位置"
                     ) {
                         Text(currentPath)
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
@@ -138,24 +138,24 @@ struct SettingsView: View {
                             )
 
                         HStack(spacing: 8) {
-                            SettingsPrimaryButton(title: "Choose Folder") {
+                            SettingsPrimaryButton(title: "选择文件夹") {
                                 selectFolder()
                             }
 
-                            SettingsGhostButton(title: "Reset Path") {
+                            SettingsGhostButton(title: "重置路径") {
                                 resetToDefault()
                             }
                         }
 
-                        sectionHint("Notes are stored as .md files")
+                        sectionHint("便签以 .md 文件存储")
                     }
 
                     SettingsCard(
-                        title: "Window",
-                        subtitle: "Auto-hide behavior"
+                        title: "窗口",
+                        subtitle: "自动隐藏行为"
                     ) {
                         Toggle(isOn: $shortcutSettings.autoHideOnMouseExit) {
-                            Text("Auto-hide when mouse exits")
+                            Text("鼠标移出时自动隐藏")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(Color(hex: "3B433E"))
                         }
@@ -164,13 +164,13 @@ struct SettingsView: View {
                         if shortcutSettings.autoHideOnMouseExit {
                             VStack(spacing: 8) {
                                 HStack {
-                                    Text("Hide Delay")
+                                    Text("隐藏延迟")
                                         .font(.system(size: 12, weight: .medium))
                                         .foregroundColor(Color(hex: "5C645E"))
 
                                     Spacer()
 
-                                    Text(String(format: "%.1f s", shortcutSettings.hideDelay))
+                                    Text(String(format: "%.1f 秒", shortcutSettings.hideDelay))
                                         .font(.system(size: 12, weight: .semibold))
                                         .foregroundColor(Color(hex: "6E8B77"))
                                 }
@@ -185,15 +185,15 @@ struct SettingsView: View {
                             .padding(.top, 2)
                         }
 
-                        sectionHint("Controls when the app window automatically hides")
+                        sectionHint("控制应用窗口何时自动隐藏")
                     }
 
                     SettingsCard(
-                        title: "Keyboard Shortcut",
-                        subtitle: "Global toggle key"
+                        title: "键盘快捷键",
+                        subtitle: "全局切换键"
                     ) {
                         HStack(alignment: .center, spacing: 10) {
-                            Text("Toggle Window")
+                            Text("切换窗口")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(Color(hex: "3B433E"))
                                 .frame(width: 110, alignment: .leading)
@@ -203,16 +203,16 @@ struct SettingsView: View {
                     }
 
                     SettingsCard(
-                        title: "Updates",
-                        subtitle: "Release and version information"
+                        title: "更新",
+                        subtitle: "版本与发布信息"
                     ) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Current Version: v\(updateService.currentVersion)")
+                            Text("当前版本：v\(updateService.currentVersion)")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(Color(hex: "3B433E"))
 
                             if let latest = updateService.latestVersion {
-                                Text(updateService.hasNewVersion() ? "Latest: v\(latest) (new available)" : "Latest: v\(latest) (up to date)")
+                                Text(updateService.hasNewVersion() ? "最新版本：v\(latest)（有新版本）" : "最新版本：v\(latest)（已是最新）")
                                     .font(.system(size: 11, weight: .medium))
                                     .foregroundColor(updateService.hasNewVersion() ? Color(hex: "5F896F") : Color(hex: "818A82"))
                             }
@@ -224,26 +224,26 @@ struct SettingsView: View {
                             }
                         }
 
-                        SettingsPrimaryButton(title: updateService.isChecking ? "Checking..." : "Check for Updates", isDisabled: updateService.isChecking) {
+                        SettingsPrimaryButton(title: updateService.isChecking ? "检查中…" : "检查更新", isDisabled: updateService.isChecking) {
                             Task {
                                 await updateService.checkForUpdates(silent: false)
                             }
                         }
 
-                        sectionHint("Automatic update check frequency: Daily")
+                        sectionHint("自动检查更新频率：每天")
                     }
                 }
                 .padding(16)
             }
         }
         .frame(width: 500, height: 650)
-        .alert("Reload Required", isPresented: $showReloadAlert) {
-            Button("Reload Now", role: .none) {
+        .alert("需要重新加载", isPresented: $showReloadAlert) {
+            Button("立即重新加载", role: .none) {
                 onPathChanged()
             }
-            Button("Later", role: .cancel) { }
+            Button("稍后", role: .cancel) { }
         } message: {
-            Text("Storage location changed. Reload notes to see files from the new location?")
+            Text("存储位置已更改。是否重新加载便签以查看新位置的文件？")
         }
         .sheet(isPresented: $updateService.showUpdateAlert) {
             UpdateAlertView(updateService: updateService)
@@ -253,11 +253,11 @@ struct SettingsView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Settings")
+            Text("设置")
                 .font(.system(size: 26, weight: .bold))
                 .foregroundColor(Color(hex: "27302A"))
 
-            Text("Tune workspace behavior, storage and update preferences")
+            Text("调整工作区行为、存储与更新偏好")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(Color(hex: "7C857E"))
         }
@@ -278,8 +278,8 @@ struct SettingsView: View {
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
         panel.canCreateDirectories = true
-        panel.message = "Select a folder to store your notes"
-        panel.prompt = "Select"
+        panel.message = "选择存储便签的文件夹"
+        panel.prompt = "选择"
 
         if panel.runModal() == .OK, let url = panel.url {
             currentPath = url.path

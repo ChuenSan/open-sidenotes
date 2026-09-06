@@ -19,7 +19,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .leading) {
+        ZStack(alignment: .trailing) {
             Color(hex: "F4F5F1").ignoresSafeArea()
 
             VStack(spacing: 8) {
@@ -75,7 +75,7 @@ struct ContentView: View {
                         }
                     }
                 )
-                .transition(.move(edge: .leading).combined(with: .opacity))
+                .transition(.move(edge: .trailing).combined(with: .opacity))
                 .zIndex(3)
             }
 
@@ -123,7 +123,7 @@ struct ContentView: View {
         }
         .background(workspaceShortcuts)
         .alert(
-            "Storage Error",
+            "存储错误",
             isPresented: Binding(
                 get: { noteStore.errorMessage != nil },
                 set: { isPresented in
@@ -133,7 +133,7 @@ struct ContentView: View {
                 }
             )
         ) {
-            Button("OK", role: .cancel) {
+            Button("确定", role: .cancel) {
                 noteStore.clearErrorMessage()
             }
         } message: {
@@ -152,7 +152,7 @@ struct ContentView: View {
 
         if !OnboardingManager.hasCreatedWelcomeNote() {
             let welcomeNote = await noteStore.addNote(
-                title: "Welcome",
+                title: "欢迎",
                 content: Constants.defaultWelcomeContent
             )
             OnboardingManager.markWelcomeNoteCreated()
@@ -259,7 +259,7 @@ struct ContentView: View {
 
         Task {
             let newNote = await noteStore.addNote(
-                title: "Untitled",
+                title: "无标题",
                 content: ""
             )
             selectedNote = newNote
@@ -342,22 +342,22 @@ struct ContentView: View {
     }
 
     private func todayNoteTitle(from date: Date) -> String {
-        "Daily \(Self.dailyNoteDateFormatter.string(from: date))"
+        "每日 \(Self.dailyNoteDateFormatter.string(from: date))"
     }
 
     private func todayNoteTemplate(from date: Date) -> String {
         let formattedDate = Self.dailyNoteDateFormatter.string(from: date)
         return """
-        # Daily Note \(formattedDate)
+        # 每日便签 \(formattedDate)
 
-        ## Priorities
-        - [ ] 
+        ## 今日重点
+        - [ ]
 
-        ## Notes
-        - 
+        ## 笔记
+        -
 
-        ## Follow-ups
-        - [ ] 
+        ## 待办跟进
+        - [ ]
         """
     }
 
@@ -403,13 +403,13 @@ private struct NotesHeader: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            HeaderIconButton(icon: "sidebar.left", tooltip: "Toggle notes drawer", action: onToggleSidebar)
+            HeaderIconButton(icon: "sidebar.left", tooltip: "切换便签抽屉", action: onToggleSidebar)
 
             Spacer(minLength: 0)
 
-            HeaderActionButton(label: "New note", icon: "square.and.pencil", action: onPrimaryAction)
+            HeaderActionButton(label: "新建便签", icon: "square.and.pencil", action: onPrimaryAction)
 
-            HeaderIconButton(icon: "gearshape", tooltip: "Settings", action: onOpenSettings)
+            HeaderIconButton(icon: "gearshape", tooltip: "设置", action: onOpenSettings)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)

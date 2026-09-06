@@ -120,7 +120,7 @@ class KeyRecorderButton: NSView {
         let fontWeight: NSFont.Weight
 
         if isRecording {
-            text = "Press keys..."
+            text = "按下快捷键…"
             textColor = NSColor(hex: "666666")
             fontWeight = .regular
         } else if let shortcut = currentShortcut {
@@ -128,7 +128,7 @@ class KeyRecorderButton: NSView {
             textColor = NSColor(hex: "2C2C2C")
             fontWeight = .medium
         } else {
-            text = "Click to record"
+            text = "点击录制"
             textColor = NSColor(hex: "999999")
             fontWeight = .regular
         }

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @State private var cursorX: CGFloat = 300
-    @State private var panelOffset: CGFloat = 140
+    @State private var panelOffset: CGFloat = -140
     let onClose: () -> Void
 
     var body: some View {
@@ -15,11 +15,11 @@ struct OnboardingView: View {
                     .foregroundColor(Color(hex: "7C9885"))
                     .padding(.top, 50)
 
-                Text("Welcome to Open Sidenotes")
+                Text("欢迎使用 Open Sidenotes")
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(Color(hex: "2C2C2C"))
 
-                Text("Move your mouse to the right edge\nof the screen to open the notes panel")
+                Text("将鼠标移到屏幕左边缘\n即可打开便签面板")
                     .font(.system(size: 14))
                     .foregroundColor(Color(hex: "666666"))
                     .multilineTextAlignment(.center)
@@ -31,7 +31,7 @@ struct OnboardingView: View {
                         .frame(width: 480, height: 220)
                         .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
 
-                    ZStack(alignment: .trailing) {
+                    ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(hex: "7C9885").opacity(0.15))
                             .frame(width: 140, height: 200)
@@ -50,7 +50,7 @@ struct OnboardingView: View {
                             )
                             .offset(x: panelOffset)
                     }
-                    .frame(width: 460, height: 200, alignment: .trailing)
+                    .frame(width: 460, height: 200, alignment: .leading)
                     .clipped()
 
                     Image(systemName: "cursorarrow.rays")
@@ -60,12 +60,12 @@ struct OnboardingView: View {
                 }
                 .padding(.vertical, 8)
 
-                Text("Slide to the edge to toggle")
+                Text("滑向边缘即可显示/隐藏")
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "999999"))
 
                 Button(action: onClose) {
-                    Text("Got it!")
+                    Text("知道了")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.white)
                         .frame(width: 120)
@@ -86,7 +86,7 @@ struct OnboardingView: View {
     private func startAnimation() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             withAnimation(.easeInOut(duration: 2.0)) {
-                cursorX = 500
+                cursorX = 100
             }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -96,7 +96,7 @@ struct OnboardingView: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeIn(duration: 0.3)) {
-                        panelOffset = 140
+                        panelOffset = -140
                     }
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

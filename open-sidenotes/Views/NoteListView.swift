@@ -8,7 +8,7 @@ struct NoteListView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 12) {
-                Text("Notes")
+                Text("便签")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(Color(hex: "6B6B6B"))
                     .tracking(0.5)
@@ -25,7 +25,7 @@ struct NoteListView: View {
                         .clipShape(Circle())
                 }
                 .buttonStyle(PlainButtonStyle())
-                .help("Create new note")
+                .help("新建便签")
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -45,7 +45,7 @@ struct NoteListView: View {
                     Image(systemName: "doc.text")
                         .font(.system(size: 32, weight: .light))
                         .foregroundColor(Color(hex: "CACACA"))
-                    Text("No notes yet")
+                    Text("还没有便签")
                         .font(.system(size: 13, weight: .regular))
                         .foregroundColor(Color(hex: "999999"))
                     Spacer()
@@ -82,7 +82,7 @@ struct NoteListItemView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(note.title.isEmpty ? "Untitled" : note.title)
+            Text(note.title.isEmpty ? "无标题" : note.title)
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(isSelected ? Color(hex: "2C2C2C") : Color(hex: "3C3C3C"))
                 .lineLimit(1)

@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve Swift packages
+        run: |
+          xcodebuild -project open-sidenotes.xcodeproj \
+            -scheme open-sidenotes \
+            -resolvePackageDependencies
+
+      - name: Build
+        run: |
+          xcodebuild -project open-sidenotes.xcodeproj \
+            -scheme open-sidenotes \
+            -configuration Release \
+            -derivedDataPath build \
+            build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: open-sidenotes-app
+          path: build/Build/Products/Release/open-sidenotes.app

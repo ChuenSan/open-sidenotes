@@ -85,7 +85,7 @@ struct NoteEditorView: View {
 
             if isEditing || selectedNote == nil {
                 VStack(alignment: .leading, spacing: 0) {
-                    TextField("Untitled", text: $title)
+                    TextField("无标题", text: $title)
                         .font(.system(size: 26, weight: .semibold))
                         .foregroundColor(Color(hex: "2C2C2C"))
                         .textFieldStyle(.plain)
@@ -95,7 +95,7 @@ struct NoteEditorView: View {
 
                     if isEditing, let note = selectedNote {
                         HStack(spacing: 6) {
-                            Text("Last edited \(timeAgo(from: note.updatedAt))")
+                            Text("上次编辑于 \(timeAgo(from: note.updatedAt))")
                                 .font(.system(size: 11, weight: .regular))
                                 .foregroundColor(Color(hex: "999999"))
                         }
@@ -120,11 +120,11 @@ struct NoteEditorView: View {
                         .font(.system(size: 48, weight: .ultraLight))
                         .foregroundColor(Color(hex: "CACACA"))
 
-                    Text("Select a note to edit")
+                    Text("选择一篇便签进行编辑")
                         .font(.system(size: 14, weight: .regular))
                         .foregroundColor(Color(hex: "999999"))
 
-                    Text("or create a new one")
+                    Text("或新建一篇")
                         .font(.system(size: 12, weight: .regular))
                         .foregroundColor(Color(hex: "BBBBBB"))
 

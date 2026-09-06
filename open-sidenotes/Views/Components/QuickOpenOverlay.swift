@@ -36,7 +36,7 @@ struct QuickOpenOverlay: View {
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(Color(hex: "7D857D"))
 
-                        TextField("Quick open notes", text: $query)
+                        TextField("快速打开便签", text: $query)
                             .textFieldStyle(.plain)
                             .font(.system(size: 14, weight: .medium))
                             .focused($isSearchFocused)
@@ -64,7 +64,7 @@ struct QuickOpenOverlay: View {
                             Image(systemName: "doc.text.magnifyingglass")
                                 .font(.system(size: 24, weight: .regular))
                                 .foregroundColor(Color(hex: "A4ACA4"))
-                            Text("No matching notes")
+                            Text("没有匹配的便签")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(Color(hex: "8A938A"))
                             Spacer(minLength: 26)
@@ -97,9 +97,9 @@ struct QuickOpenOverlay: View {
                         .background(Color(hex: "E3E8E1"))
 
                     HStack(spacing: 12) {
-                        Text("↩ Open")
-                        Text("↑↓ Select")
-                        Text("Esc Close")
+                        Text("↩ 打开")
+                        Text("↑↓ 选择")
+                        Text("Esc 关闭")
                     }
                     .font(.system(size: 10, weight: .medium))
                     .foregroundColor(Color(hex: "9AA29A"))
@@ -252,12 +252,12 @@ private struct QuickOpenRow: View {
 
     private var titleText: String {
         let trimmed = note.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "Untitled" : trimmed
+        return trimmed.isEmpty ? "无标题" : trimmed
     }
 
     private var previewText: String {
         let merged = note.content.replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
-        return merged.isEmpty ? "No content" : String(merged.prefix(120))
+        return merged.isEmpty ? "无内容" : String(merged.prefix(120))
     }
 
     var body: some View {
@@ -294,13 +294,13 @@ private struct QuickOpenRow: View {
 
     private func relativeTime(from date: Date) -> String {
         let seconds = Int(Date().timeIntervalSince(date))
-        if seconds < 60 { return "now" }
-        if seconds < 3600 { return "\(seconds / 60)m" }
-        if seconds < 86400 { return "\(seconds / 3600)h" }
-        if seconds < 604800 { return "\(seconds / 86400)d" }
+        if seconds < 60 { return "刚刚" }
+        if seconds < 3600 { return "\(seconds / 60) 分钟前" }
+        if seconds < 86400 { return "\(seconds / 3600) 小时前" }
+        if seconds < 604800 { return "\(seconds / 86400) 天前" }
 
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.dateFormat = "M月d日"
         return formatter.string(from: date)
     }
 }

@@ -14,74 +14,74 @@ struct SlashCommand: Identifiable, Equatable {
     static let allCommands: [SlashCommand] = [
         SlashCommand(
             trigger: "h1",
-            title: "Heading 1",
-            description: "Large section heading",
+            title: "一级标题",
+            description: "大号章节标题",
             template: "# ",
             icon: "textformat.size.larger",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "h2",
-            title: "Heading 2",
-            description: "Medium section heading",
+            title: "二级标题",
+            description: "中号章节标题",
             template: "## ",
             icon: "textformat.size",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "quote",
-            title: "Quote",
-            description: "Insert a quote block",
+            title: "引用",
+            description: "插入引用块",
             template: "> \(cursorMarker)",
             icon: "text.quote",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "h3",
-            title: "Heading 3",
-            description: "Small section heading",
+            title: "三级标题",
+            description: "小号章节标题",
             template: "### ",
             icon: "textformat.size.smaller",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "todo",
-            title: "Task List",
-            description: "Create a task item",
+            title: "任务列表",
+            description: "创建任务项",
             template: "- [ ] ",
             icon: "checkmark.square",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "ul",
-            title: "Bullet List",
-            description: "Unordered list item",
+            title: "无序列表",
+            description: "无序列表项",
             template: "- ",
             icon: "list.bullet",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "ol",
-            title: "Numbered List",
-            description: "Ordered list item",
+            title: "有序列表",
+            description: "有序列表项",
             template: "1. ",
             icon: "list.number",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "code",
-            title: "Code Block",
-            description: "Insert code snippet",
+            title: "代码块",
+            description: "插入代码片段",
             template: "```\n\n```",
             icon: "chevron.left.forwardslash.chevron.right",
             needsLanguageSelector: true
         ),
         SlashCommand(
             trigger: "table",
-            title: "Table",
-            description: "Insert markdown table",
+            title: "表格",
+            description: "插入 Markdown 表格",
             template: """
-            | Column 1 | Column 2 | Column 3 |
+            | 列 1 | 列 2 | 列 3 |
             | --- | --- | --- |
             | \(cursorMarker) |  |  |
             """,
@@ -90,110 +90,110 @@ struct SlashCommand: Identifiable, Equatable {
         ),
         SlashCommand(
             trigger: "date",
-            title: "Date",
-            description: "Insert current date",
+            title: "日期",
+            description: "插入当前日期",
             template: "",
             icon: "calendar",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "today",
-            title: "Today",
-            description: "Insert today's section",
+            title: "今日",
+            description: "插入今日章节",
             template: "",
             icon: "sun.max",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "meeting",
-            title: "Meeting Notes",
-            description: "Template: meeting notes",
+            title: "会议记录",
+            description: "模板：会议记录",
             template: """
-            # Meeting Notes
-            - Date: {{date}}
-            - Attendees:
-            - Agenda:
+            # 会议记录
+            - 日期：{{date}}
+            - 参会人：
+            - 议程：
 
-            ## Notes
+            ## 笔记
             - \(cursorMarker)
 
-            ## Action Items
-            - [ ] 
+            ## 行动项
+            - [ ]
             """,
             icon: "person.3",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "daily",
-            title: "Daily Report",
-            description: "Template: daily report",
+            title: "日报",
+            description: "模板：每日报告",
             template: """
-            # Daily Report
-            - Date: {{date}}
+            # 日报
+            - 日期：{{date}}
 
-            ## Done
+            ## 已完成
             - \(cursorMarker)
 
-            ## In Progress
-            - 
+            ## 进行中
+            -
 
-            ## Next
-            - 
+            ## 下一步
+            -
 
-            ## Blockers
-            - 
+            ## 阻塞问题
+            -
             """,
             icon: "sunrise",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "issue",
-            title: "Issue Log",
-            description: "Template: issue tracking note",
+            title: "问题记录",
+            description: "模板：问题追踪笔记",
             template: """
-            # Issue Log
-            - Date: {{date}}
-            - Severity:
-            - Status: Open
+            # 问题记录
+            - 日期：{{date}}
+            - 严重程度：
+            - 状态：待处理
 
-            ## Summary
+            ## 摘要
             \(cursorMarker)
 
-            ## Repro Steps
-            1. 
-            2. 
-            3. 
+            ## 复现步骤
+            1.
+            2.
+            3.
 
-            ## Expected
+            ## 预期结果
 
-            ## Actual
+            ## 实际结果
 
-            ## Fix Plan
-            - [ ] 
+            ## 修复计划
+            - [ ]
             """,
             icon: "exclamationmark.triangle",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "bold",
-            title: "Bold Text",
-            description: "Make text bold",
+            title: "粗体",
+            description: "将文字加粗",
             template: "**text**",
             icon: "bold",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "italic",
-            title: "Italic Text",
-            description: "Make text italic",
+            title: "斜体",
+            description: "将文字倾斜",
             template: "*text*",
             icon: "italic",
             needsLanguageSelector: false
         ),
         SlashCommand(
             trigger: "link",
-            title: "Link",
-            description: "Insert a hyperlink",
+            title: "链接",
+            description: "插入超链接",
             template: "[text](url)",
             icon: "link",
             needsLanguageSelector: false

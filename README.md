@@ -23,7 +23,7 @@
 
 ## Features
 
-- **Edge Activation** — Move your mouse to the right edge of the screen to reveal the notes panel
+- **Edge Activation** — Move your mouse to the left edge of the screen to reveal the notes panel
 - **Keyboard Shortcut** — Toggle window with customizable global shortcut (default: ⌘⌃Space)
 - **Live Markdown** — Typora-style editing with real-time rendering while preserving source syntax
 - **Auto Save** — Your notes are automatically saved as you type
@@ -57,7 +57,7 @@ xcodebuild -project open-sidenotes.xcodeproj -scheme open-sidenotes build
 ## Usage
 
 1. Launch the app — it runs as a menu bar utility
-2. **Show panel**: Move mouse to the right edge OR press `⌘⌃Space`
+2. **Show panel**: Move mouse to the left edge OR press `⌘⌃Space`
 3. Start writing in Markdown with live rendering
 4. **Hide panel**: Move to edge again, press shortcut again, or let it auto-hide
 5. Access settings from the menu bar icon

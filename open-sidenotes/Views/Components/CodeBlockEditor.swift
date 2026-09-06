@@ -16,7 +16,7 @@ struct CodeBlockEditor: NSViewRepresentable {
         containerView.layer?.borderColor = NSColor(red: 0.88, green: 0.88, blue: 0.88, alpha: 1.0).cgColor
 
         let copyButton = NSButton()
-        copyButton.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: "Copy")
+        copyButton.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: "复制")
         copyButton.bezelStyle = .regularSquare
         copyButton.isBordered = false
         copyButton.imagePosition = .imageOnly
@@ -130,10 +130,10 @@ struct CodeBlockEditor: NSViewRepresentable {
         func showCopyFeedback() {
             copyFeedbackWorkItem?.cancel()
 
-            copyButton?.image = NSImage(systemSymbolName: "checkmark", accessibilityDescription: "Copied")
+            copyButton?.image = NSImage(systemSymbolName: "checkmark", accessibilityDescription: "已复制")
 
             let workItem = DispatchWorkItem { [weak self] in
-                self?.copyButton?.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: "Copy")
+                self?.copyButton?.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: "复制")
             }
 
             copyFeedbackWorkItem = workItem

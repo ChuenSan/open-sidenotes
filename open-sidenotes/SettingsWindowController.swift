@@ -13,7 +13,7 @@ class SettingsWindowController: NSWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "Settings"
+        window.title = "设置"
         window.titlebarAppearsTransparent = true
         window.backgroundColor = .windowBackgroundColor
         window.level = .normal

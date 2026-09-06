@@ -23,7 +23,7 @@ struct FindReplaceBar: View {
                         .font(.system(size: 12))
                         .foregroundColor(Color(hex: "888888"))
 
-                    TextField("Find", text: $searchText)
+                    TextField("查找", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
                         .font(.system(size: 13))
                         .focused($isSearchFocused)
@@ -84,7 +84,7 @@ struct FindReplaceBar: View {
                             .font(.system(size: 12))
                             .foregroundColor(Color(hex: "888888"))
 
-                        TextField("Replace", text: $replaceText)
+                        TextField("替换", text: $replaceText)
                             .textFieldStyle(PlainTextFieldStyle())
                             .font(.system(size: 13))
                             .onSubmit { onReplace() }
@@ -99,14 +99,14 @@ struct FindReplaceBar: View {
                     )
 
                     Button(action: onReplace) {
-                        Text("Replace")
+                        Text("替换")
                             .font(.system(size: 11, weight: .medium))
                     }
                     .buttonStyle(FindBarButton())
                     .disabled(matchCount == 0)
 
                     Button(action: onReplaceAll) {
-                        Text("All")
+                        Text("全部")
                             .font(.system(size: 11, weight: .medium))
                     }
                     .buttonStyle(FindBarButton())

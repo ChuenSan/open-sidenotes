@@ -19,7 +19,7 @@ struct NoteListDrawer: View {
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
-        ZStack(alignment: .leading) {
+        ZStack(alignment: .trailing) {
             Color.black.opacity(0.24)
                 .ignoresSafeArea()
                 .onTapGesture {
@@ -27,6 +27,8 @@ struct NoteListDrawer: View {
                 }
 
             HStack(spacing: 0) {
+                Spacer(minLength: 0)
+
                 VStack(alignment: .leading, spacing: 0) {
                     drawerHeader
                     searchBar
@@ -42,12 +44,10 @@ struct NoteListDrawer: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .stroke(Color(hex: "E6EAE3"), lineWidth: 1)
                         )
-                        .shadow(color: Color.black.opacity(0.09), radius: 20, x: 6, y: 0)
+                        .shadow(color: Color.black.opacity(0.09), radius: 20, x: -6, y: 0)
                 )
-                .padding(.leading, 12)
+                .padding(.trailing, 12)
                 .padding(.vertical, 12)
-
-                Spacer(minLength: 0)
             }
         }
         .onAppear {
@@ -81,18 +81,18 @@ struct NoteListDrawer: View {
     private var drawerHeader: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Notes Library")
+                Text("便签库")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color(hex: "242824"))
 
-                Text("\(noteStore.notes.count) note\(noteStore.notes.count == 1 ? "" : "s")")
+                Text("\(noteStore.notes.count) 篇便签")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(Color(hex: "8B8F89"))
             }
 
             Spacer(minLength: 10)
 
-            DrawerIconButton(icon: "xmark", tooltip: "Close") {
+            DrawerIconButton(icon: "xmark", tooltip: "关闭") {
                 onClose()
             }
         }
@@ -107,7 +107,7 @@ struct NoteListDrawer: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(Color(hex: "8D928B"))
 
-            TextField("Search notes", text: $searchText)
+            TextField("搜索便签", text: $searchText)
                 .textFieldStyle(.plain)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundColor(Color(hex: "2E332F"))
@@ -147,7 +147,7 @@ struct NoteListDrawer: View {
                 VStack(spacing: 10) {
                     Spacer()
                     ProgressView()
-                    Text("Loading notes...")
+                    Text("正在加载…")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(Color(hex: "9AA097"))
                     Spacer()
@@ -155,14 +155,14 @@ struct NoteListDrawer: View {
             } else if noteStore.notes.isEmpty {
                 drawerState(
                     icon: "note.text",
-                    title: "No notes yet",
-                    subtitle: "Create your first note to get started"
+                    title: "还没有便签",
+                    subtitle: "创建你的第一篇便签开始使用"
                 )
             } else if filteredNotes.isEmpty {
                 drawerState(
                     icon: "magnifyingglass",
-                    title: "No results",
-                    subtitle: "Try a different keyword"
+                    title: "没有结果",
+                    subtitle: "换个关键词试试"
                 )
             } else {
                 CustomScrollView {
@@ -196,7 +196,7 @@ struct NoteListDrawer: View {
                                         }
                                     }
                                 } label: {
-                                    Label("Delete", systemImage: "trash")
+                                    Label("删除", systemImage: "trash")
                                 }
                             }
                         }
@@ -211,13 +211,13 @@ struct NoteListDrawer: View {
 
     private var drawerFooter: some View {
         HStack {
-            Text("New note: ⌘N")
+            Text("新建便签：⌘N")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(Color(hex: "A0A59F"))
 
             Spacer()
 
-            Text("Quick open: ⌘J")
+            Text("快速打开：⌘J")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(Color(hex: "A0A59F"))
         }
@@ -462,13 +462,13 @@ private struct DrawerNoteListItemCard: View {
 
     private var noteTitle: String {
         let normalized = note.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        return normalized.isEmpty ? "Untitled" : normalized
+        return normalized.isEmpty ? "无标题" : normalized
     }
 
     private var notePreview: String {
         let preview = note.content.replacingOccurrences(of: "\n", with: " ")
         let normalized = preview.trimmingCharacters(in: .whitespacesAndNewlines)
-        return normalized.isEmpty ? "No content" : String(normalized.prefix(120))
+        return normalized.isEmpty ? "无内容" : String(normalized.prefix(120))
     }
 
     private var highlightedTitle: AttributedString {
@@ -505,20 +505,20 @@ private struct DrawerNoteListItemCard: View {
         let seconds = Int(Date().timeIntervalSince(date))
 
         if seconds < 60 {
-            return "now"
+            return "刚刚"
         }
         if seconds < 3600 {
-            return "\(seconds / 60)m"
+            return "\(seconds / 60) 分钟前"
         }
         if seconds < 86400 {
-            return "\(seconds / 3600)h"
+            return "\(seconds / 3600) 小时前"
         }
         if seconds < 604800 {
-            return "\(seconds / 86400)d"
+            return "\(seconds / 86400) 天前"
         }
 
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
+        formatter.dateFormat = "M月d日"
         return formatter.string(from: date)
     }
 }

@@ -12,7 +12,7 @@ struct UpdateAlertView: View {
                     .foregroundColor(Color(hex: "7C9885"))
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("New Version Available")
+                    Text("发现新版本")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Color(hex: "333333"))
 
@@ -34,7 +34,7 @@ struct UpdateAlertView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Current Version")
+                        Text("当前版本")
                             .font(.system(size: 11))
                             .foregroundColor(Color(hex: "999999"))
                         Text("v\(updateService.currentVersion)")
@@ -51,7 +51,7 @@ struct UpdateAlertView: View {
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: 4) {
-                        Text("Latest Version")
+                        Text("最新版本")
                             .font(.system(size: 11))
                             .foregroundColor(Color(hex: "999999"))
                         if let latest = updateService.latestVersion {
@@ -67,7 +67,7 @@ struct UpdateAlertView: View {
                         Image(systemName: "calendar")
                             .font(.system(size: 11))
                             .foregroundColor(Color(hex: "999999"))
-                        Text("Released: \(date)")
+                        Text("发布日期：\(date)")
                             .font(.system(size: 11))
                             .foregroundColor(Color(hex: "999999"))
                     }
@@ -78,7 +78,7 @@ struct UpdateAlertView: View {
                         Image(systemName: "doc.fill")
                             .font(.system(size: 11))
                             .foregroundColor(Color(hex: "999999"))
-                        Text("File Size: \(size)")
+                        Text("文件大小：\(size)")
                             .font(.system(size: 11))
                             .foregroundColor(Color(hex: "999999"))
                     }
@@ -90,7 +90,7 @@ struct UpdateAlertView: View {
 
             if let notes = updateService.releaseNotes, !notes.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Release Notes")
+                    Text("更新说明")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(Color(hex: "666666"))
 
@@ -116,7 +116,7 @@ struct UpdateAlertView: View {
                 Button(action: {
                     dismiss()
                 }) {
-                    Text("Remind Me Later")
+                    Text("稍后提醒")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(Color(hex: "666666"))
                         .frame(maxWidth: .infinity)
@@ -130,7 +130,7 @@ struct UpdateAlertView: View {
                     updateService.downloadUpdate()
                     dismiss()
                 }) {
-                    Text("Download Now")
+                    Text("立即下载")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)

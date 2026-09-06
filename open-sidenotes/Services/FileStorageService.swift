@@ -120,7 +120,7 @@ class FileStorageService {
 
     private func preferredBaseFileURL(for note: Note) -> URL {
         let safeName = sanitizeFileName(note.title)
-        let baseName = safeName.isEmpty ? "Untitled" : safeName
+        let baseName = safeName.isEmpty ? "无标题" : safeName
         return storageDirectory.standardizedFileURL.appendingPathComponent("\(baseName).md")
     }
 
@@ -328,7 +328,7 @@ class FileStorageService {
         guard let split = splitFrontMatter(from: content) else {
             return Note(
                 id: UUID(uuidString: fileURL.deletingPathExtension().lastPathComponent) ?? UUID(),
-                title: "Untitled",
+                title: "无标题",
                 content: content,
                 createdAt: Date(),
                 updatedAt: Date()
@@ -338,7 +338,7 @@ class FileStorageService {
         let frontMatter = split.frontMatter
         let markdownContent = split.content
 
-        var title = "Untitled"
+        var title = "无标题"
         var id = UUID()
         var createdAt = Date()
         var updatedAt = Date()

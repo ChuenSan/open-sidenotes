@@ -118,7 +118,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let menu = NSMenu()
 
         menu.addItem(NSMenuItem(
-            title: "Toggle Window",
+            title: "切换窗口",
             action: #selector(toggleWindow),
             keyEquivalent: ""
         ))
@@ -126,7 +126,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(
-            title: "Settings...",
+            title: "设置…",
             action: #selector(openSettings),
             keyEquivalent: ","
         ))
@@ -134,7 +134,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(
-            title: "Quit Sidenotes",
+            title: "退出 Sidenotes",
             action: #selector(quitApp),
             keyEquivalent: "q"
         ))

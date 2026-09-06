@@ -68,7 +68,7 @@ class GitHubUpdateService: ObservableObject {
 
         let urlString = "https://api.github.com/repos/\(repoOwner)/\(repoName)/releases/latest"
         guard let url = URL(string: urlString) else {
-            checkError = "Invalid URL"
+            checkError = "无效的 URL"
             return
         }
 
@@ -80,12 +80,12 @@ class GitHubUpdateService: ObservableObject {
             let (data, response) = try await URLSession.shared.data(for: request)
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                checkError = "Invalid response"
+                checkError = "无效的响应"
                 return
             }
 
             guard httpResponse.statusCode == 200 else {
-                checkError = "Server returned error: \(httpResponse.statusCode)"
+                checkError = "服务器返回错误：\(httpResponse.statusCode)"
                 return
             }
 
@@ -113,7 +113,7 @@ class GitHubUpdateService: ObservableObject {
             }
 
         } catch {
-            checkError = "Check update failed: \(error.localizedDescription)"
+            checkError = "检查更新失败：\(error.localizedDescription)"
         }
     }
 

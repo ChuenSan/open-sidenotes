@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Open Sidenotes is a macOS menu bar application that provides a floating side panel for quick note-taking with **Markdown real-time rendering**. The app uses a mouse-triggered edge activation mechanism to show/hide a notes panel that slides in from the right edge of the screen.
+Open Sidenotes is a macOS menu bar application that provides a floating side panel for quick note-taking with **Markdown real-time rendering**. The app uses a mouse-triggered edge activation mechanism to show/hide a notes panel that slides in from the left edge of the screen.
 
 ### Key Features
 
@@ -20,7 +20,7 @@ Open Sidenotes is a macOS menu bar application that provides a floating side pan
   - Completed tasks show strikethrough and gray color
   - Checkbox markers `[ ]` and `[x]` shown in dimmed gray
   - Edit text directly to toggle status (standard Markdown behavior)
-- **Edge-triggered Activation**: Move mouse to right edge to toggle panel
+- **Edge-triggered Activation**: Move mouse to left edge to toggle panel
 - **Auto-save**: Changes saved automatically after 1 second
 - **Drawer UI**: Slide-in note list overlay
 - **Settings Panel**: Comprehensive customization options
@@ -66,8 +66,8 @@ Or use Xcode: Open `open-sidenotes.xcodeproj` and press Cmd+R to run.
 - AppDelegate initializes `SideNotesWindowController` on launch
 
 **Window Management (`SideNotesWindowController.swift`)**
-- Creates a borderless, floating window positioned at the right edge of the screen
-- Implements edge-triggered activation: moving mouse to right screen edge (within 2px) toggles window visibility
+- Creates a borderless, floating window positioned at the left edge of the screen
+- Implements edge-triggered activation: moving mouse to left screen edge (within 2px) toggles window visibility
 - Uses global mouse event monitoring (`NSEvent.addGlobalMonitorForEvents`)
 - Animates window slide-in/out with 0.2s duration using `NSAnimationContext`
 - Auto-hide on mouse exit with configurable delay (0-3s)
@@ -141,7 +141,7 @@ Or use Xcode: Open `open-sidenotes.xcodeproj` and press Cmd+R to run.
 ### Data Flow
 
 1. **App Launch** → Loads `ShortcutSettings` and `LastOpenedNoteManager` → Restores last note if exists
-2. **Edge Trigger** → User moves mouse to right edge → `SideNotesWindowController` detects → Window slides in
+2. **Edge Trigger** → User moves mouse to left edge → `SideNotesWindowController` detects → Window slides in
 3. **Keyboard Toggle** → User presses shortcut (⌘⌃Space) → `ShortcutManager` triggers window toggle
 4. **Note Selection** → User selects note → Saves to `LastOpenedNoteManager` → Loads content from `NoteStore`
 5. **Markdown Editing** → User types → Render triggers (space/newline/1s delay) → `MarkdownRenderer` applies styling
@@ -167,7 +167,7 @@ Or use Xcode: Open `open-sidenotes.xcodeproj` and press Cmd+R to run.
 - The app runs as a menu bar utility (Dock icon visibility is configurable)
 - Window appears across all spaces and during full-screen apps
 - Markdown editing preserves all syntax - fully reversible
-- Mouse edge detection threshold is 2px from right screen edge
+- Mouse edge detection threshold is 2px from left screen edge
 - Auto-hide delay is configurable from 0-3 seconds (default: 0.5s)
 - Default keyboard shortcut: ⌘⌃Space (customizable)
 - Settings require app restart for Dock icon changes to take effect

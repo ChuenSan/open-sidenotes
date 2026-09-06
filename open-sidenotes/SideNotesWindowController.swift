@@ -12,7 +12,7 @@ class SideNotesWindowController: NSWindowController {
     private var keyMonitor: Any?
     private let windowWidth: CGFloat = 400
     private var isShown = false
-    private var lastAtRightEdge = false
+    private var lastAtLeftEdge = false
     private var hideTimer: Timer?
     private var dummyWindow: NSWindow?
     private var isAnimating = false
@@ -22,7 +22,7 @@ class SideNotesWindowController: NSWindowController {
     init() {
         let visibleFrame = NSScreen.main!.visibleFrame
         let window = KeyableWindow(
-            contentRect: NSRect(x: visibleFrame.maxX, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height),
+            contentRect: NSRect(x: visibleFrame.minX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height),
             styleMask: [.borderless, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -40,7 +40,7 @@ class SideNotesWindowController: NSWindowController {
         hostingView.frame = NSRect(x: 0, y: 0, width: windowWidth, height: visibleFrame.height)
         hostingView.wantsLayer = true
         hostingView.layer?.cornerRadius = 12
-        hostingView.layer?.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+        hostingView.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         hostingView.layer?.masksToBounds = true
         window.contentView = hostingView
 
@@ -134,9 +134,9 @@ class SideNotesWindowController: NSWindowController {
     private func handleMouseMove() {
         let mouseLocation = NSEvent.mouseLocation
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
-        let atRightEdge = mouseLocation.x >= visibleFrame.maxX - 2
+        let atLeftEdge = mouseLocation.x <= visibleFrame.minX + 2
 
-        if atRightEdge && !lastAtRightEdge {
+        if atLeftEdge && !lastAtLeftEdge {
             if !isShown {
                 showWindow()
             }
@@ -145,7 +145,7 @@ class SideNotesWindowController: NSWindowController {
             startHideTimer()
         }
 
-        lastAtRightEdge = atRightEdge
+        lastAtLeftEdge = atLeftEdge
     }
 
     private func handleClickOutside(_ event: NSEvent) {
@@ -186,12 +186,12 @@ class SideNotesWindowController: NSWindowController {
         isShown = true
         isAnimating = true
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
-        window.setFrame(NSRect(x: visibleFrame.maxX, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: false)
+        window.setFrame(NSRect(x: visibleFrame.minX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: false)
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.2
-            window.animator().setFrame(NSRect(x: visibleFrame.maxX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: true)
+            window.animator().setFrame(NSRect(x: visibleFrame.minX, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: true)
         }, completionHandler: { [weak self] in
             self?.isAnimating = false
         })
@@ -206,7 +206,7 @@ class SideNotesWindowController: NSWindowController {
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.2
-            window.animator().setFrame(NSRect(x: visibleFrame.maxX, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: true)
+            window.animator().setFrame(NSRect(x: visibleFrame.minX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: true)
         }, completionHandler: { [weak self] in
             window.orderOut(nil)
             self?.isAnimating = false

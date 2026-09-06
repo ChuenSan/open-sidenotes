@@ -21,7 +21,7 @@ enum CodeLanguage: String, CaseIterable, Identifiable {
         case .json: return "JSON"
         case .html: return "HTML"
         case .css: return "CSS"
-        case .plain: return "Plain Text"
+        case .plain: return "纯文本"
         }
     }
 
