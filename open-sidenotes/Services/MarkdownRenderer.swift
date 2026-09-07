@@ -34,6 +34,7 @@ class MarkdownRenderer {
             ]
         )
 
+        applyAutoLinks(to: attributed)
         applyCodeBlocks(to: attributed)
         applyHeadings(to: attributed)
         applyTaskLists(to: attributed)
@@ -163,6 +164,7 @@ class MarkdownRenderer {
             attributed.addAttribute(.foregroundColor, value: markColor, range: closeRange)
             attributed.addAttribute(.font, value: codeFont, range: contentRange)
             attributed.addAttribute(.foregroundColor, value: codeColor, range: contentRange)
+            attributed.removeAttribute(.link, range: contentRange)
         }
     }
 
@@ -208,6 +210,19 @@ class MarkdownRenderer {
             let markerRange = match.range(at: 2)
 
             attributed.addAttribute(.foregroundColor, value: markColor, range: markerRange)
+        }
+    }
+
+    private func applyAutoLinks(to attributed: NSMutableAttributedString) {
+        let pattern = "https?://[^\\s]+"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+
+        let matches = regex.matches(in: attributed.string, range: NSRange(location: 0, length: attributed.length))
+
+        for match in matches.reversed() {
+            let urlString = (attributed.string as NSString).substring(with: match.range)
+            attributed.addAttribute(.link, value: urlString, range: match.range)
+            attributed.addAttribute(.foregroundColor, value: linkColor, range: match.range)
         }
     }
 
