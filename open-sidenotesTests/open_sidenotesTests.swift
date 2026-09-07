@@ -375,3 +375,58 @@ struct FileStorageServiceTests {
         .filter { $0.pathExtension == "md" }
     }
 }
+
+struct PanelLayoutTests {
+    private let screen = NSRect(x: 100, y: 50, width: 1440, height: 900)
+
+    @Test func defaultSizeFillsVisibleHeightAndUsesDefaultWidth() {
+        let frame = PanelLayout.frame(
+            in: screen,
+            width: PanelLayout.defaultWidth,
+            heightRatio: PanelLayout.defaultHeightRatio,
+            verticalOffset: PanelLayout.defaultVerticalOffset,
+            shown: true
+        )
+
+        #expect(frame.width == 400)
+        #expect(frame.height == 900)
+        #expect(frame.minX == 100)
+        #expect(frame.minY == 50)
+    }
+
+    @Test func hiddenFrameSlidesLeftByPanelWidth() {
+        let frame = PanelLayout.frame(
+            in: screen,
+            width: 400,
+            heightRatio: 1,
+            verticalOffset: 0.5,
+            shown: false
+        )
+
+        #expect(frame.minX == 100 - 400)
+        #expect(frame.height == 900)
+    }
+
+    @Test func reducedHeightPinsToBottomCenterAndTop() {
+        let bottom = PanelLayout.frame(in: screen, width: 400, heightRatio: 0.5, verticalOffset: 0, shown: true)
+        let center = PanelLayout.frame(in: screen, width: 400, heightRatio: 0.5, verticalOffset: 0.5, shown: true)
+        let top = PanelLayout.frame(in: screen, width: 400, heightRatio: 0.5, verticalOffset: 1, shown: true)
+
+        #expect(bottom.height == 450)
+        #expect(bottom.minY == 50)
+        #expect(center.minY == 50 + 225)
+        #expect(top.maxY == screen.maxY)
+    }
+
+    @Test func clampsWidthAndHeightRatioToAllowedRange() {
+        let narrow = PanelLayout.frame(in: screen, width: 100, heightRatio: 0.1, verticalOffset: -1, shown: true)
+        let wide = PanelLayout.frame(in: screen, width: 999, heightRatio: 2, verticalOffset: 2, shown: true)
+
+        #expect(narrow.width == CGFloat(PanelLayout.widthRange.lowerBound))
+        #expect(narrow.height == 320)
+        #expect(narrow.minY == 50)
+        #expect(wide.width == CGFloat(PanelLayout.widthRange.upperBound))
+        #expect(wide.height == 900)
+        #expect(wide.minY == 50)
+    }
+}

@@ -57,16 +57,56 @@ class ShortcutSettings: ObservableObject {
         }
     }
 
+    @Published var panelWidth: Double {
+        didSet {
+            UserDefaults.standard.set(panelWidth, forKey: panelWidthKey)
+            NotificationCenter.default.post(name: .panelSizeSettingChanged, object: nil)
+        }
+    }
+
+    @Published var panelHeightRatio: Double {
+        didSet {
+            UserDefaults.standard.set(panelHeightRatio, forKey: panelHeightRatioKey)
+            NotificationCenter.default.post(name: .panelSizeSettingChanged, object: nil)
+        }
+    }
+
+    @Published var panelVerticalOffset: Double {
+        didSet {
+            UserDefaults.standard.set(panelVerticalOffset, forKey: panelVerticalOffsetKey)
+            NotificationCenter.default.post(name: .panelSizeSettingChanged, object: nil)
+        }
+    }
+
     private let toggleWindowKey = "toggleWindowShortcut"
     private let showDockIconKey = "showDockIcon"
     private let autoHideOnMouseExitKey = "autoHideOnMouseExit"
     private let hideDelayKey = "hideDelay"
+    private let panelWidthKey = "panelWidth"
+    private let panelHeightRatioKey = "panelHeightRatio"
+    private let panelVerticalOffsetKey = "panelVerticalOffset"
 
     private init() {
         showDockIcon = UserDefaults.standard.object(forKey: showDockIconKey) as? Bool ?? true
         autoHideOnMouseExit = UserDefaults.standard.object(forKey: autoHideOnMouseExitKey) as? Bool ?? true
         hideDelay = UserDefaults.standard.object(forKey: hideDelayKey) as? Double ?? 0.5
+        panelWidth = Self.clamped(
+            UserDefaults.standard.object(forKey: panelWidthKey) as? Double ?? PanelLayout.defaultWidth,
+            in: PanelLayout.widthRange
+        )
+        panelHeightRatio = Self.clamped(
+            UserDefaults.standard.object(forKey: panelHeightRatioKey) as? Double ?? PanelLayout.defaultHeightRatio,
+            in: PanelLayout.heightRatioRange
+        )
+        panelVerticalOffset = Self.clamped(
+            UserDefaults.standard.object(forKey: panelVerticalOffsetKey) as? Double ?? PanelLayout.defaultVerticalOffset,
+            in: PanelLayout.verticalOffsetRange
+        )
         load()
+    }
+
+    private static func clamped(_ value: Double, in range: ClosedRange<Double>) -> Double {
+        min(range.upperBound, max(range.lowerBound, value))
     }
 
     private func load() {
@@ -178,4 +218,5 @@ extension Notification.Name {
     static let dockIconSettingChanged = Notification.Name("dockIconSettingChanged")
     static let openSettingsWindow = Notification.Name("openSettingsWindow")
     static let flushActiveNoteDraft = Notification.Name("flushActiveNoteDraft")
+    static let panelSizeSettingChanged = Notification.Name("panelSizeSettingChanged")
 }

@@ -152,8 +152,46 @@ struct SettingsView: View {
 
                     SettingsCard(
                         title: "窗口",
-                        subtitle: "自动隐藏行为"
+                        subtitle: "尺寸与自动隐藏"
                     ) {
+                        sliderRow(
+                            title: "面板宽度",
+                            valueText: "\(Int(shortcutSettings.panelWidth.rounded())) px"
+                        ) {
+                            CustomSlider(
+                                value: $shortcutSettings.panelWidth,
+                                range: PanelLayout.widthRange,
+                                step: 10,
+                                tintColor: Color(hex: "6E8B77")
+                            )
+                        }
+
+                        sliderRow(
+                            title: "面板高度",
+                            valueText: "\(Int((shortcutSettings.panelHeightRatio * 100).rounded()))%"
+                        ) {
+                            CustomSlider(
+                                value: $shortcutSettings.panelHeightRatio,
+                                range: PanelLayout.heightRatioRange,
+                                step: 0.05,
+                                tintColor: Color(hex: "6E8B77")
+                            )
+                        }
+
+                        if shortcutSettings.panelHeightRatio < 0.995 {
+                            sliderRow(
+                                title: "垂直位置",
+                                valueText: verticalOffsetLabel
+                            ) {
+                                CustomSlider(
+                                    value: $shortcutSettings.panelVerticalOffset,
+                                    range: PanelLayout.verticalOffsetRange,
+                                    step: 0.05,
+                                    tintColor: Color(hex: "6E8B77")
+                                )
+                            }
+                        }
+
                         Toggle(isOn: $shortcutSettings.autoHideOnMouseExit) {
                             Text("鼠标移出时自动隐藏")
                                 .font(.system(size: 13, weight: .medium))
@@ -162,19 +200,10 @@ struct SettingsView: View {
                         .toggleStyle(CustomToggleStyle(tintColor: Color(hex: "6E8B77")))
 
                         if shortcutSettings.autoHideOnMouseExit {
-                            VStack(spacing: 8) {
-                                HStack {
-                                    Text("隐藏延迟")
-                                        .font(.system(size: 12, weight: .medium))
-                                        .foregroundColor(Color(hex: "5C645E"))
-
-                                    Spacer()
-
-                                    Text(String(format: "%.1f 秒", shortcutSettings.hideDelay))
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundColor(Color(hex: "6E8B77"))
-                                }
-
+                            sliderRow(
+                                title: "隐藏延迟",
+                                valueText: String(format: "%.1f 秒", shortcutSettings.hideDelay)
+                            ) {
                                 CustomSlider(
                                     value: $shortcutSettings.hideDelay,
                                     range: 0.0...3.0,
@@ -185,7 +214,7 @@ struct SettingsView: View {
                             .padding(.top, 2)
                         }
 
-                        sectionHint("控制应用窗口何时自动隐藏")
+                        sectionHint("缩短高度可减少对主屏幕的遮挡，修改后立即生效")
                     }
 
                     SettingsCard(
@@ -249,6 +278,37 @@ struct SettingsView: View {
             UpdateAlertView(updateService: updateService)
         }
         .animation(.easeInOut(duration: 0.2), value: shortcutSettings.autoHideOnMouseExit)
+        .animation(.easeInOut(duration: 0.2), value: shortcutSettings.panelHeightRatio < 0.995)
+    }
+
+    private var verticalOffsetLabel: String {
+        let value = shortcutSettings.panelVerticalOffset
+        if value < 0.05 { return "底部" }
+        if value > 0.95 { return "顶部" }
+        if abs(value - 0.5) < 0.05 { return "居中" }
+        return String(format: "%.0f%%", value * 100)
+    }
+
+    private func sliderRow<Content: View>(
+        title: String,
+        valueText: String,
+        @ViewBuilder slider: () -> Content
+    ) -> some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(Color(hex: "5C645E"))
+
+                Spacer()
+
+                Text(valueText)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Color(hex: "6E8B77"))
+            }
+
+            slider()
+        }
     }
 
     private var headerSection: some View {

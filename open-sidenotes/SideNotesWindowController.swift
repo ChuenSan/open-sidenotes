@@ -1,6 +1,32 @@
 import Cocoa
 import SwiftUI
 
+enum PanelLayout {
+    static let widthRange: ClosedRange<Double> = 280...560
+    static let heightRatioRange: ClosedRange<Double> = 0.4...1.0
+    static let verticalOffsetRange: ClosedRange<Double> = 0...1
+    static let defaultWidth: Double = 400
+    static let defaultHeightRatio: Double = 1.0
+    static let defaultVerticalOffset: Double = 0.5
+    static let minHeight: CGFloat = 320
+
+    static func frame(
+        in visibleFrame: NSRect,
+        width: Double,
+        heightRatio: Double,
+        verticalOffset: Double,
+        shown: Bool
+    ) -> NSRect {
+        let panelWidth = CGFloat(min(widthRange.upperBound, max(widthRange.lowerBound, width)))
+        let ratio = min(heightRatioRange.upperBound, max(heightRatioRange.lowerBound, heightRatio))
+        let height = min(visibleFrame.height, max(minHeight, visibleFrame.height * CGFloat(ratio)))
+        let offset = min(verticalOffsetRange.upperBound, max(verticalOffsetRange.lowerBound, verticalOffset))
+        let y = visibleFrame.minY + (visibleFrame.height - height) * CGFloat(offset)
+        let x = shown ? visibleFrame.minX : visibleFrame.minX - panelWidth
+        return NSRect(x: x, y: y, width: panelWidth, height: height)
+    }
+}
+
 class KeyableWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
@@ -10,7 +36,6 @@ class SideNotesWindowController: NSWindowController {
     private var pollTimer: Timer?
     private var clickMonitor: Any?
     private var keyMonitor: Any?
-    private let windowWidth: CGFloat = 400
     private var isShown = false
     private var lastAtLeftEdge = false
     private var hideTimer: Timer?
@@ -21,8 +46,16 @@ class SideNotesWindowController: NSWindowController {
 
     init() {
         let visibleFrame = NSScreen.main!.visibleFrame
+        let initialSettings = ShortcutSettings.shared
+        let hiddenFrame = PanelLayout.frame(
+            in: visibleFrame,
+            width: initialSettings.panelWidth,
+            heightRatio: initialSettings.panelHeightRatio,
+            verticalOffset: initialSettings.panelVerticalOffset,
+            shown: false
+        )
         let window = KeyableWindow(
-            contentRect: NSRect(x: visibleFrame.minX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height),
+            contentRect: hiddenFrame,
             styleMask: [.borderless, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -37,7 +70,8 @@ class SideNotesWindowController: NSWindowController {
 
         let contentView = ContentView()
         let hostingView = NSHostingView(rootView: contentView)
-        hostingView.frame = NSRect(x: 0, y: 0, width: windowWidth, height: visibleFrame.height)
+        hostingView.frame = NSRect(origin: .zero, size: hiddenFrame.size)
+        hostingView.autoresizingMask = [.width, .height]
         hostingView.wantsLayer = true
         hostingView.layer?.cornerRadius = 12
         hostingView.layer?.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
@@ -49,6 +83,12 @@ class SideNotesWindowController: NSWindowController {
         setupDummyWindow()
         setupEventMonitors()
         setupTrackingArea()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(panelSizeSettingChanged),
+            name: .panelSizeSettingChanged,
+            object: nil
+        )
     }
 
     private func setupDummyWindow() {
@@ -184,17 +224,34 @@ class SideNotesWindowController: NSWindowController {
         hideTimer = nil
     }
 
+    private func currentFrame(in visibleFrame: NSRect, shown: Bool) -> NSRect {
+        PanelLayout.frame(
+            in: visibleFrame,
+            width: settings.panelWidth,
+            heightRatio: settings.panelHeightRatio,
+            verticalOffset: settings.panelVerticalOffset,
+            shown: shown
+        )
+    }
+
+    @objc private func panelSizeSettingChanged() {
+        guard isShown, !isAnimating, let window = window, let visibleFrame = NSScreen.main?.visibleFrame else {
+            return
+        }
+        window.setFrame(currentFrame(in: visibleFrame, shown: true), display: true)
+    }
+
     private func showWindow() {
         guard let window = self.window, !isShown, !isAnimating else { return }
         isShown = true
         isAnimating = true
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
-        window.setFrame(NSRect(x: visibleFrame.minX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: false)
+        window.setFrame(currentFrame(in: visibleFrame, shown: false), display: false)
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.2
-            window.animator().setFrame(NSRect(x: visibleFrame.minX, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: true)
+            window.animator().setFrame(currentFrame(in: visibleFrame, shown: true), display: true)
         }, completionHandler: { [weak self] in
             self?.isAnimating = false
         })
@@ -209,7 +266,7 @@ class SideNotesWindowController: NSWindowController {
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.2
-            window.animator().setFrame(NSRect(x: visibleFrame.minX - windowWidth, y: visibleFrame.minY, width: windowWidth, height: visibleFrame.height), display: true)
+            window.animator().setFrame(currentFrame(in: visibleFrame, shown: false), display: true)
         }, completionHandler: { [weak self] in
             window.orderOut(nil)
             self?.isAnimating = false
