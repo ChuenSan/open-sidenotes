@@ -429,4 +429,37 @@ struct PanelLayoutTests {
         #expect(wide.height == 900)
         #expect(wide.minY == 50)
     }
+
+    @Test func fullHeightActivationAcceptsEntireLeftEdge() {
+        #expect(isActivation(NSPoint(x: 101, y: 50), heightRatio: 1, offset: 0.5))
+        #expect(isActivation(NSPoint(x: 102, y: 500), heightRatio: 1, offset: 0.5))
+        #expect(isActivation(NSPoint(x: 100, y: 950), heightRatio: 1, offset: 0.5))
+    }
+
+    @Test func reducedHeightActivationIgnoresLeftEdgeOutsidePanel() {
+        #expect(isActivation(NSPoint(x: 101, y: 50), heightRatio: 0.5, offset: 0))
+        #expect(!isActivation(NSPoint(x: 101, y: 600), heightRatio: 0.5, offset: 0))
+
+        #expect(isActivation(NSPoint(x: 101, y: 275), heightRatio: 0.5, offset: 0.5))
+        #expect(!isActivation(NSPoint(x: 101, y: 50), heightRatio: 0.5, offset: 0.5))
+        #expect(!isActivation(NSPoint(x: 101, y: 950), heightRatio: 0.5, offset: 0.5))
+
+        #expect(isActivation(NSPoint(x: 101, y: 950), heightRatio: 0.5, offset: 1))
+        #expect(!isActivation(NSPoint(x: 101, y: 50), heightRatio: 0.5, offset: 1))
+    }
+
+    @Test func activationRequiresLeftEdgeEvenInsidePanelHeight() {
+        #expect(!isActivation(NSPoint(x: 103, y: 275), heightRatio: 0.5, offset: 0.5))
+        #expect(!isActivation(NSPoint(x: 300, y: 275), heightRatio: 0.5, offset: 0.5))
+    }
+
+    private func isActivation(_ point: NSPoint, heightRatio: Double, offset: Double) -> Bool {
+        PanelLayout.containsActivationPoint(
+            point,
+            in: screen,
+            width: 400,
+            heightRatio: heightRatio,
+            verticalOffset: offset
+        )
+    }
 }

@@ -9,6 +9,7 @@ enum PanelLayout {
     static let defaultHeightRatio: Double = 1.0
     static let defaultVerticalOffset: Double = 0.5
     static let minHeight: CGFloat = 320
+    static let edgeThreshold: CGFloat = 2
 
     static func frame(
         in visibleFrame: NSRect,
@@ -25,6 +26,25 @@ enum PanelLayout {
         let x = shown ? visibleFrame.minX : visibleFrame.minX - panelWidth
         return NSRect(x: x, y: y, width: panelWidth, height: height)
     }
+
+    static func containsActivationPoint(
+        _ point: NSPoint,
+        in visibleFrame: NSRect,
+        width: Double,
+        heightRatio: Double,
+        verticalOffset: Double
+    ) -> Bool {
+        let panel = frame(
+            in: visibleFrame,
+            width: width,
+            heightRatio: heightRatio,
+            verticalOffset: verticalOffset,
+            shown: true
+        )
+        let atLeftEdge = point.x <= visibleFrame.minX + edgeThreshold
+        let inPanelHeight = point.y >= panel.minY && point.y <= panel.maxY
+        return atLeftEdge && inPanelHeight
+    }
 }
 
 class KeyableWindow: NSWindow {
@@ -37,7 +57,7 @@ class SideNotesWindowController: NSWindowController {
     private var clickMonitor: Any?
     private var keyMonitor: Any?
     private var isShown = false
-    private var lastAtLeftEdge = false
+    private var lastInActivationZone = false
     private var hideTimer: Timer?
     private var dummyWindow: NSWindow?
     private var isAnimating = false
@@ -177,9 +197,15 @@ class SideNotesWindowController: NSWindowController {
     private func handleMouseMove() {
         let mouseLocation = NSEvent.mouseLocation
         guard let visibleFrame = NSScreen.main?.visibleFrame else { return }
-        let atLeftEdge = mouseLocation.x <= visibleFrame.minX + 2
+        let inActivationZone = PanelLayout.containsActivationPoint(
+            mouseLocation,
+            in: visibleFrame,
+            width: settings.panelWidth,
+            heightRatio: settings.panelHeightRatio,
+            verticalOffset: settings.panelVerticalOffset
+        )
 
-        if atLeftEdge && (!lastAtLeftEdge || !isShown) {
+        if inActivationZone && (!lastInActivationZone || !isShown) {
             if !isShown {
                 showWindow()
             }
@@ -188,7 +214,7 @@ class SideNotesWindowController: NSWindowController {
             startHideTimer()
         }
 
-        lastAtLeftEdge = atLeftEdge
+        lastInActivationZone = inActivationZone
     }
 
     private func handleClickOutside(_ event: NSEvent) {
