@@ -115,6 +115,79 @@ struct QuickOpenSearchServiceTests {
     }
 }
 
+struct MarkdownRendererLinkTests {
+    @Test func autoLinksBareHTTPSURLAsNSURL() {
+        let url = "https://github.com/ChuenSan/xiaomi10s/actions"
+        let rendered = MarkdownRenderer.shared.render("see \(url) now")
+        let range = (rendered.string as NSString).range(of: url)
+        var effective = NSRange()
+        let value = rendered.attribute(.link, at: range.location, effectiveRange: &effective)
+
+        #expect(value as? URL == URL(string: url))
+        #expect(effective == range)
+    }
+
+    @Test func refreshAutoLinksAppliesWithoutFullRender() {
+        let url = "https://github.com/ChuenSan/xiaomi10s/actions"
+        let storage = NSMutableAttributedString(string: url)
+        MarkdownRenderer.shared.refreshAutoLinks(in: storage)
+
+        #expect(storage.attribute(.link, at: 0, effectiveRange: nil) as? URL == URL(string: url))
+    }
+
+    @Test func refreshAutoLinksRemovesStaleLinkAfterEdit() {
+        let storage = NSMutableAttributedString(string: "https://github.com/ChuenSan/xiaomi10s/actions")
+        MarkdownRenderer.shared.refreshAutoLinks(in: storage)
+        storage.replaceCharacters(in: NSRange(location: 0, length: storage.length), with: "not a link")
+        MarkdownRenderer.shared.refreshAutoLinks(in: storage)
+
+        #expect(storage.attribute(.link, at: 0, effectiveRange: nil) == nil)
+    }
+
+    @Test func refreshAutoLinksKeepsMarkdownLinks() {
+        let url = "https://github.com/ChuenSan/xiaomi10s/actions"
+        let rendered = MarkdownRenderer.shared.render("[docs](\(url))")
+        let storage = NSMutableAttributedString(attributedString: rendered)
+        MarkdownRenderer.shared.refreshAutoLinks(in: storage)
+
+        #expect(storage.string == "docs")
+        #expect(storage.attribute(.link, at: 0, effectiveRange: nil) as? URL == URL(string: url))
+    }
+
+    @Test func doesNotLinkURLInsideInlineCode() {
+        let url = "https://github.com/ChuenSan/xiaomi10s/actions"
+        let rendered = MarkdownRenderer.shared.render("`\(url)`")
+        let range = (rendered.string as NSString).range(of: url)
+
+        #expect(range.location != NSNotFound)
+        #expect(rendered.attribute(.link, at: range.location, effectiveRange: nil) == nil)
+    }
+
+    @Test func doesNotLinkURLInsideFencedCode() {
+        let url = "https://github.com/ChuenSan/xiaomi10s/actions"
+        let rendered = MarkdownRenderer.shared.render("```\n\(url)\n```")
+        let range = (rendered.string as NSString).range(of: url)
+
+        #expect(range.location != NSNotFound)
+        #expect(rendered.attribute(.link, at: range.location, effectiveRange: nil) == nil)
+    }
+
+    @Test func ignoresMailtoAndBareEmail() {
+        let rendered = MarkdownRenderer.shared.render("mail me@x.com mailto:me@x.com")
+        var foundLink = false
+        rendered.enumerateAttribute(.link, in: NSRange(location: 0, length: rendered.length)) { value, _, _ in
+            if value != nil { foundLink = true }
+        }
+        #expect(!foundLink)
+    }
+
+    @Test func urlFromLinkOnlyAllowsHTTPSchemes() {
+        #expect(MarkdownRenderer.url(from: "mailto:me@x.com") == nil)
+        #expect(MarkdownRenderer.url(from: URL(string: "mailto:me@x.com")!) == nil)
+        #expect(MarkdownRenderer.url(from: "https://github.com/ChuenSan/xiaomi10s/actions") == URL(string: "https://github.com/ChuenSan/xiaomi10s/actions"))
+    }
+}
+
 struct SlashCommandTests {
     @Test func dateCommandResolvesCurrentDate() throws {
         let formatter = ISO8601DateFormatter()

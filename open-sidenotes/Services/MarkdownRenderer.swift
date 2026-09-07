@@ -165,6 +165,7 @@ class MarkdownRenderer {
             attributed.addAttribute(.font, value: codeFont, range: contentRange)
             attributed.addAttribute(.foregroundColor, value: codeColor, range: contentRange)
             attributed.removeAttribute(.link, range: contentRange)
+            attributed.removeAttribute(Self.autoLinkMarkerKey, range: contentRange)
         }
     }
 
@@ -213,18 +214,96 @@ class MarkdownRenderer {
         }
     }
 
-    private func applyAutoLinks(to attributed: NSMutableAttributedString) {
-        let pattern = "https?://[^\\s]+"
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+    func applyLiveAutoLinks(in textView: NSTextView) {
+        guard let storage = textView.textStorage else { return }
+        storage.beginEditing()
+        refreshAutoLinks(in: storage)
+        storage.endEditing()
+        clearLinkFromTypingAttributes(of: textView)
+    }
 
-        let matches = regex.matches(in: attributed.string, range: NSRange(location: 0, length: attributed.length))
+    func refreshAutoLinks(in attributed: NSMutableAttributedString) {
+        let fullRange = NSRange(location: 0, length: attributed.length)
+        let protected = protectedCodeRanges(in: attributed.string as NSString)
+
+        attributed.enumerateAttribute(Self.autoLinkMarkerKey, in: fullRange, options: .reverse) { value, range, _ in
+            guard value != nil else { return }
+            attributed.removeAttribute(.link, range: range)
+            attributed.removeAttribute(Self.autoLinkMarkerKey, range: range)
+            if !rangeIntersects(range, protected) {
+                attributed.addAttribute(.foregroundColor, value: baseColor, range: range)
+            }
+        }
+
+        applyAutoLinks(to: attributed, skipping: protected)
+    }
+
+    func clearLinkFromTypingAttributes(of textView: NSTextView) {
+        var typing = textView.typingAttributes
+        guard typing[.link] != nil || typing[Self.autoLinkMarkerKey] != nil else { return }
+        typing.removeValue(forKey: .link)
+        typing.removeValue(forKey: Self.autoLinkMarkerKey)
+        typing[.foregroundColor] = baseColor
+        textView.typingAttributes = typing
+    }
+
+    static func url(from link: Any) -> URL? {
+        let parsed: URL?
+        if let url = link as? URL {
+            parsed = url
+        } else if let string = link as? String {
+            parsed = URL(string: string)
+        } else {
+            parsed = nil
+        }
+
+        guard let parsed, let scheme = parsed.scheme?.lowercased(), scheme == "http" || scheme == "https" else {
+            return nil
+        }
+        return parsed
+    }
+
+    static func openLink(_ link: Any) -> Bool {
+        guard let url = url(from: link) else { return false }
+        return NSWorkspace.shared.open(url)
+    }
+
+    private func applyAutoLinks(to attributed: NSMutableAttributedString, skipping protected: [NSRange]? = nil) {
+        let nsText = attributed.string as NSString
+        let fullRange = NSRange(location: 0, length: attributed.length)
+        let protectedRanges = protected ?? protectedCodeRanges(in: nsText)
+        let matches = Self.autoLinkRegex.matches(in: attributed.string, range: fullRange)
 
         for match in matches.reversed() {
-            let urlString = (attributed.string as NSString).substring(with: match.range)
-            attributed.addAttribute(.link, value: urlString, range: match.range)
+            if rangeIntersects(match.range, protectedRanges) { continue }
+            let urlString = nsText.substring(with: match.range)
+            guard let url = URL(string: urlString) else { continue }
+            attributed.addAttribute(.link, value: url, range: match.range)
+            attributed.addAttribute(Self.autoLinkMarkerKey, value: true, range: match.range)
             attributed.addAttribute(.foregroundColor, value: linkColor, range: match.range)
         }
     }
+
+    private func protectedCodeRanges(in text: NSString) -> [NSRange] {
+        let fullRange = NSRange(location: 0, length: text.length)
+        var ranges = Self.fencedCodeRegex.matches(in: text as String, range: fullRange).map(\.range)
+
+        for match in Self.inlineCodeRegex.matches(in: text as String, range: fullRange) {
+            if !rangeIntersects(match.range, ranges) {
+                ranges.append(match.range)
+            }
+        }
+        return ranges
+    }
+
+    private func rangeIntersects(_ range: NSRange, _ ranges: [NSRange]) -> Bool {
+        ranges.contains { NSIntersectionRange(range, $0).length > 0 }
+    }
+
+    private static let autoLinkRegex = try! NSRegularExpression(pattern: "https?://[^\\s]+")
+    private static let autoLinkMarkerKey = NSAttributedString.Key("sidenotes.autoLink")
+    private static let fencedCodeRegex = try! NSRegularExpression(pattern: "```[\\s\\S]*?```")
+    private static let inlineCodeRegex = try! NSRegularExpression(pattern: "`[^`\\n]+`")
 
     private func applyLinks(to attributed: NSMutableAttributedString) {
         // Match [text](url) format
@@ -245,7 +324,7 @@ class MarkdownRenderer {
             let linkAttributes: [NSAttributedString.Key: Any] = [
                 .foregroundColor: linkColor,
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .link: urlString,
+                .link: URL(string: urlString) ?? urlString,
                 .font: baseFont
             ]
 

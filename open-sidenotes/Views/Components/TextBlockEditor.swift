@@ -195,11 +195,22 @@ struct TextBlockEditor: NSViewRepresentable {
             checkSlashCommand(in: textView, at: cursorPosition)
 
             containerView?.invalidateIntrinsicContentSize()
+
+            let markedRange = textView.markedRange()
+            let isInMarkedTextMode = markedRange.location != NSNotFound && markedRange.length > 0
+            if !isInMarkedTextMode {
+                MarkdownRenderer.shared.applyLiveAutoLinks(in: textView)
+            }
+        }
+
+        func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+            MarkdownRenderer.openLink(link)
         }
 
         func renderMarkdown(in textView: NSTextView, text: String) {
             let attributedString = MarkdownRenderer.shared.render(text)
             textView.textStorage?.setAttributedString(attributedString)
+            MarkdownRenderer.shared.clearLinkFromTypingAttributes(of: textView)
 
             containerView?.invalidateIntrinsicContentSize()
         }

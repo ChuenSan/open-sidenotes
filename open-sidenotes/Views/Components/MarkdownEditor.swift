@@ -171,6 +171,11 @@ struct MarkdownEditor: NSViewRepresentable {
 
             currentEditingLineRange = getCurrentLineRange(in: textView, at: cursorPosition)
             lastText = plainText
+            MarkdownRenderer.shared.applyLiveAutoLinks(in: textView)
+        }
+
+        func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+            MarkdownRenderer.openLink(link)
         }
 
         func textDidEndEditing(_ notification: Notification) {
@@ -214,6 +219,7 @@ struct MarkdownEditor: NSViewRepresentable {
             scrollView.contentView.setBoundsOrigin(savedScrollPosition)
 
             applySearchHighlight(in: textView, query: lastSearchQuery, currentIndex: lastMatchIndex)
+            MarkdownRenderer.shared.clearLinkFromTypingAttributes(of: textView)
         }
 
         func applySearchHighlight(in textView: NSTextView, query: String, currentIndex: Int) {
